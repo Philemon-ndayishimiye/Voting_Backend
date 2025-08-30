@@ -1,7 +1,11 @@
+import sequelize from "../config/db";
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
 
-const UserModel = sequelize.define("users", {
+const Candidates = sequelize.define("candidates", {
+  identificationCard: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   fullName: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -14,30 +18,26 @@ const UserModel = sequelize.define("users", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  password: {
+
+  supportiveDocument: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  identificationCard: {
+
+  objectives: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  district: {
+
+  image: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  sector: {
-    type: DataTypes.STRING,
+  votes: {
+    type: DataTypes.INTEGER,
     allowNull: false,
-  },
-  cell: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  village: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    defaultValue: 0,
   },
 });
 
-export default UserModel;
+export default Candidates;

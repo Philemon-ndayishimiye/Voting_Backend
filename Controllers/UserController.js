@@ -1,41 +1,53 @@
-import dbconn from "../config/db.js"; // This is correct
-import { DataTypes } from "sequelize";
-import UserModel from "../models/User.js";
+import UserModel from "../models/user.js";
+import bcrypt from "bcrypt";
 
-const User = UserModel(dbconn, DataTypes);
-
-const createUser = async (req, res) => {
+export const CreateUser = async (req, res) => {
   const {
     fullName,
     phoneNumber,
     email,
+    district,
+    sector,
+    cell,
+    village,
     password,
-    IdentificationCard,
-    District,
-    Sector,
-    Cell,
-    Village,
+    identificationCard,
   } = req.body;
 
   try {
-    const user = await User.create({
+    // check if ID already exists
+    const existingUser = await UserModel.findOne({
+      where: { identificationCard },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        error: "Identification number already registered",
+      });
+    }
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // create user
+    const user = await UserModel.create({
       fullName,
       phoneNumber,
       email,
-      password,
-      IdentificationCard,
-      District,
-      Sector,
-      Cell,
-      Village,
+      district,
+      sector,
+      cell,
+      village,
+      password: hashedPassword,
+      identificationCard,
     });
-    res.status(201).json({ message: "User created successfully", user });
+
+    return res.status(201).json({
+      message: "User created successfully",
+      user,
+    });
   } catch (error) {
-    console.error("Error occurred:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to create user", error: error.message });
+    console.error("Error creating user:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-export default createUser;
