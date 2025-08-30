@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import dbconn from "./config/db.js";
 import userRoutes from "./Routes/UserRouter.js";
+import candidatesRoute from "./Routes/CandidatesRoute.js"
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // Mount user routes
 app.use("/api/user", userRoutes);
+app.use("/api/candidate" , candidatesRoute)
 
 // Root route
 app.get("/", (req, res) => {
