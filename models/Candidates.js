@@ -1,5 +1,5 @@
 import sequelize from "../config/db.js";
-import { DataTypes } from "sequelize";
+import { DataTypes, ENUM } from "sequelize";
 
 const Candidates = sequelize.define("candidates", {
   identificationCard: {
@@ -37,6 +37,11 @@ const Candidates = sequelize.define("candidates", {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
+  },
+  accepted: {
+    type: DataTypes.ENUM("true", "false"),
+    allowNull: false,
+    defaultValue: "false",
   },
 });
 
