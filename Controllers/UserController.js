@@ -12,6 +12,7 @@ export const CreateUser = async (req, res) => {
     village,
     password,
     identificationCard,
+    role="user"
   } = req.body;
 
   try {
@@ -47,6 +48,7 @@ export const CreateUser = async (req, res) => {
       village,
       password: hashedPassword,
       identificationCard,
+      role
     });
 
     return res.status(201).json({
