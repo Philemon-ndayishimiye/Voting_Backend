@@ -3,7 +3,7 @@ import { DataTypes, ENUM } from "sequelize";
 
 const Candidates = sequelize.define("candidates", {
   identificationCard: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   fullName: {
@@ -21,7 +21,7 @@ const Candidates = sequelize.define("candidates", {
 
   supportiveDocument: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
 
   objectives: {
