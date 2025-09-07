@@ -1,4 +1,5 @@
 import CandidatesModel from "../models/Candidates.js";
+import {SendEmail} from "../utils/SendEmail.js";
 
 export const createCandidates = async (req, res) => {
   // Check if a file was uploaded
@@ -14,6 +15,7 @@ export const createCandidates = async (req, res) => {
     email,
     supportiveDocument,
     objectives,
+    village,
     votes,
   } = req.body;
 
@@ -43,11 +45,18 @@ export const createCandidates = async (req, res) => {
       email,
       supportiveDocument,
       objectives,
+      village,
       image, // Use the file path from Multer
       votes,
     });
 
     if (candidate) {
+      await SendEmail(
+        candidate.email,
+        "Application Received",
+        `Hello ${candidate.fullName},\n\nYour application has been received successfully. We will review it shortly.\n\nThank you.`
+      );
+
       return res.status(200).json({
         message: "Candidate created successfully",
         candidate,
@@ -94,7 +103,9 @@ export const updateCandidate = async (req, res) => {
       return res.status(404).json({ error: "Candidate not found" });
     }
     await candidate.update(req.body);
-    return res.status(200).json({ message: "Candidate updated successfully", candidate });
+    return res
+      .status(200)
+      .json({ message: "Candidate updated successfully", candidate });
   } catch (error) {
     console.error("Error updating candidate:", error);
     return res.status(500).json({ error: "Internal server error" });
@@ -117,7 +128,6 @@ export const deleteCandidate = async (req, res) => {
   }
 };
 
-
 // Increment votes for a candidate
 export const incrementVotes = async (req, res) => {
   const { id } = req.params;
@@ -126,10 +136,12 @@ export const incrementVotes = async (req, res) => {
     if (!candidate) {
       return res.status(404).json({ error: "Candidate not found" });
     }
-    await candidate.increment('votes', { by: 1 });
+    await candidate.increment("votes", { by: 1 });
     // Reload the candidate to get the updated votes count
     await candidate.reload();
-    return res.status(200).json({ message: "Vote counted successfully", candidate });
+    return res
+      .status(200)
+      .json({ message: "Vote counted successfully", candidate });
   } catch (error) {
     console.error("Error incrementing votes:", error);
     return res.status(500).json({ error: "Internal server error" });
@@ -144,13 +156,87 @@ export const acceptCandidate = async (req, res) => {
     if (!candidate) {
       return res.status(404).json({ error: "Candidate not found" });
     }
-    if (candidate.accepted === 'true') {
+    if (candidate.accepted === "true") {
       return res.status(400).json({ message: "Candidate is already accepted" });
     }
-    await candidate.update({ accepted: 'true' });
-    return res.status(200).json({ message: "Candidate accepted successfully", candidate });
+    await candidate.update({ accepted: "true" });
+      await SendEmail(
+      candidate.email,
+      "Application Accepted",
+      `Congratulations ${candidate.fullName}!\n\nYour application has been accepted.`
+    );
+    return res
+      .status(200)
+      .json({ message: "Candidate accepted successfully", candidate });
   } catch (error) {
     console.error("Error accepting candidate:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// Change a candidate's rejected
+export const RejectCandidates = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const candidate = await CandidatesModel.findByPk(id);
+    if (!candidate) {
+      return res.status(404).json({ error: "Candidate not found" });
+    }
+    if (candidate.accepted === "false") {
+      return res.status(400).json({ message: "Candidate is already rejected" });
+    }
+    await candidate.update({ accepted: "false" });
+       await SendEmail(
+      candidate.email,
+      "Application Rejected",
+      `Dear ${candidate.fullName},\n\nWe regret to inform you that your application has been rejected.`
+    );
+    return res.status(200).json({ message: "Candidate rejected", candidate });
+  } catch (error) {
+    console.error("Error rejecting candidate:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Get candidates in Gitwa
+export const getCandidatesGitwa = async (req, res) => {
+  try {
+    const candidates = await CandidatesModel.findAll({
+      where: { village: "Gitwa" },
+    });
+
+    return res.status(200).json({ candidates });
+  } catch (error) {
+    console.error("Error fetching Gitwa candidates:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Get candidates in Ituze
+export const getCandidatesItuze = async (req, res) => {
+  try {
+    const candidates = await CandidatesModel.findAll({
+      where: { village: "ituze" },
+    });
+
+    return res.status(200).json({ candidates });
+  } catch (error) {
+    console.error("Error fetching Ituze candidates:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Get candidates in Mpazi
+export const getCandidatesMpazi = async (req, res) => {
+  try {
+    const candidates = await CandidatesModel.findAll({
+      where: { village: "Mpazi" },
+    });
+
+    return res.status(200).json({ candidates });
+  } catch (error) {
+    console.error("Error fetching Mpazi candidates:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+

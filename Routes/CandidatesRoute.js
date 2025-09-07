@@ -8,55 +8,63 @@ import {
   updateCandidate,
   incrementVotes,
   acceptCandidate,
+  RejectCandidates,
+  getCandidatesGitwa,
+  getCandidatesItuze,
+  getCandidatesMpazi
 } from "../Controllers/CandidatesController.js";
 
 const Router = express.Router();
 /**
- * @swagger
  * components:
- *   schemas:
- *     Candidate:
- *       type: object
- *       required:
- *         - identificationCard
- *         - fullName
- *         - phoneNumber
- *         - email
- *         - objectives
- *         - votes
- *         - image
- *       properties:
- *         id:
- *           type: string
- *           description: Auto-generated ID
- *         identificationCard:
- *           type: string
- *         fullName:
- *           type: string
- *         phoneNumber:
- *           type: string
- *         email:
- *           type: string
- *         objectives:
- *           type: string
- *         votes:
- *           type: integer
- *         image:
- *           type: string
- *           format: binary
- *         accepted:
- *           type: string
- *           description: Candidate acceptance status
- *       example:
- *         id: "1"
- *         identificationCard: "1122334455123456"
- *         fullName: "Alice Candidate"
- *         phoneNumber: "0781234567"
- *         email: "alice@example.com"
- *         objectives: "Improve education in the district"
- *         votes: 0
- *         image: "uploads/alice.jpg"
- *         accepted: "false"
+  schemas:
+    Candidate:
+      type: object
+      required:
+        - identificationCard
+        - fullName
+        - phoneNumber
+        - email
+        - objectives
+        - village
+        - votes
+        - image
+      properties:
+        id:
+          type: string
+          description: Auto-generated ID
+        identificationCard:
+          type: string
+        fullName:
+          type: string
+        phoneNumber:
+          type: string
+        email:
+          type: string
+        objectives:
+          type: string
+        village:
+          type: string
+        votes:
+          type: integer
+        image:
+          type: string
+          format: binary
+        accepted:
+          type: string
+          description: Candidate acceptance status
+      example:
+        id: "1"
+        identificationCard: "1122334455123456"
+        fullName: "Alice Candidate"
+        phoneNumber: "0781234567"
+        email: "alice@example.com"
+        objectives: "Improve education in the district"
+        village: "Gitwa"
+        votes: 0
+        image: "uploads/alice.jpg"
+        accepted: "false"
+
  */
 
 /**
@@ -235,12 +243,106 @@ const Router = express.Router();
  *                   $ref: '#/components/schemas/Candidate'
  */
 
+/**
+ * @swagger
+ * /api/candidate/reject/{id}:
+ *   post:
+ *     summary: Accept a candidate
+ *     tags: [Candidates]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Candidate ID
+ *     responses:
+ *       200:
+ *         description: Candidate Rejected
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Candidate rejected"
+ *                 candidate:
+ *                   $ref: '#/components/schemas/Candidate'
+ */
+
+/**
+ * @swagger
+ * /api/candidate/mpazi:
+ *   get:
+ *     summary: Get all candidates from Mpazi village
+ *     tags: [Candidates]
+ *     responses:
+ *       200:
+ *         description: List of candidates in Mpazi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 candidates:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Candidate'
+ */
+
+/**
+ * @swagger
+ * /api/candidate/ituze:
+ *   get:
+ *     summary: Get all candidates from Ituze village
+ *     tags: [Candidates]
+ *     responses:
+ *       200:
+ *         description: List of candidates in Ituze
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 candidates:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Candidate'
+ */
+
+/**
+ * @swagger
+ * /api/candidate/gitwa:
+ *   get:
+ *     summary: Get all candidates from Gitwa village
+ *     tags: [Candidates]
+ *     responses:
+ *       200:
+ *         description: List of candidates in Gitwa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 candidates:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Candidate'
+ */
+
+
 Router.post("/registerCandidates", upload.single("image"), createCandidates);
 Router.post("/votes/:id", incrementVotes);
 Router.post("/accept/:id", acceptCandidate);
+Router.post("/reject/:id", RejectCandidates);
 Router.get("/getallcandidates", getAllCandidates);
 Router.get("/getsingleCandidates/:id", getCandidateById);
 Router.delete("/deleteCandidate/:id", deleteCandidate);
 Router.put("/updatecandidate/:id", updateCandidate);
+Router.get("/mpazi" , getCandidatesMpazi);
+Router.get("/ituze", getCandidatesItuze);
+Router.get("/gitwa", getCandidatesGitwa);
+
 
 export default Router;

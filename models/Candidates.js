@@ -29,6 +29,11 @@ const Candidates = sequelize.define("candidates", {
     allowNull: false,
   },
 
+  village:{
+    type:DataTypes.STRING,
+    allowNull:false
+  },
+
   image: {
     type: DataTypes.STRING,
     allowNull: false,
