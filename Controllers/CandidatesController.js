@@ -1,5 +1,6 @@
 import CandidatesModel from "../models/Candidates.js";
 import {SendEmail} from "../utils/SendEmail.js";
+import Vote from "../models/Votes.js"; 
 
 export const createCandidates = async (req, res) => {
   // Check if a file was uploaded
@@ -129,19 +130,38 @@ export const deleteCandidate = async (req, res) => {
 };
 
 // Increment votes for a candidate
+// Increment votes for a candidate (only one vote per user)
 export const incrementVotes = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // candidateId from URL
+  const voterEmail = req.user.email; // ✅ comes from JWT middleware
+
   try {
+    // Check candidate exists
     const candidate = await CandidatesModel.findByPk(id);
     if (!candidate) {
       return res.status(404).json({ error: "Candidate not found" });
     }
+
+    // Check if this voter already voted
+    const existingVote = await Vote.findOne({ where: { voterEmail } });
+
+    if (existingVote) {
+      return res
+        .status(400)
+        .json({ error: "You have already voted for a candidate" });
+    }
+
+    // Save the vote
+    await Vote.create({ voterEmail, candidateId: id });
+
+    // Increment the candidate's vote count
     await candidate.increment("votes", { by: 1 });
-    // Reload the candidate to get the updated votes count
     await candidate.reload();
-    return res
-      .status(200)
-      .json({ message: "Vote counted successfully", candidate });
+
+    return res.status(200).json({
+      message: "Vote counted successfully",
+      candidate,
+    });
   } catch (error) {
     console.error("Error incrementing votes:", error);
     return res.status(500).json({ error: "Internal server error" });

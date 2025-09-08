@@ -17,6 +17,7 @@ const Candidates = sequelize.define("candidates", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique:true
   },
 
   supportiveDocument: {

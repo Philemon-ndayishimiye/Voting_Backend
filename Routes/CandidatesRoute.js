@@ -1,5 +1,6 @@
 import express from "express";
 import upload from "../middleware/upload.js";
+import {authenticate} from "../middleware/jwt.js";
 import {
   createCandidates,
   getAllCandidates,
@@ -333,7 +334,7 @@ const Router = express.Router();
 
 
 Router.post("/registerCandidates", upload.single("image"), createCandidates);
-Router.post("/votes/:id", incrementVotes);
+Router.post("/votes/:id", authenticate, incrementVotes);
 Router.post("/accept/:id", acceptCandidate);
 Router.post("/reject/:id", RejectCandidates);
 Router.get("/getallcandidates", getAllCandidates);
