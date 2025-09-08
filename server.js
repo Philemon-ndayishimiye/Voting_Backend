@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
   res.send("Server is running and configured!");
 });
 
-dbconn.sync({force:true}).then(() => {
+dbconn.sync().then(() => {
   app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
   });
